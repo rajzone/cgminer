@@ -6,7 +6,7 @@ JANSSON_CPPFLAGS= -I$(top_builddir)/compat/jansson-2.5/src -I$(top_srcdir)/compa
 if WANT_USBUTILS
 USBUTILS_CPPFLAGS = -I$(top_builddir)/compat/libusb-1.0/libusb -I$(top_srcdir)/compat/libusb-1.0/libusb
 else
-USBUTILS_CPPFLAGS =
+USBUTILS_INCLUDES =
 endif
 
 EXTRA_DIST	= example.conf linux-usb-cgminer \
@@ -18,7 +18,7 @@ EXTRA_DIST	= example.conf linux-usb-cgminer \
 
 SUBDIRS		= lib compat ccan
 
-cgminer_CPPFLAGS = $(PTHREAD_FLAGS) -fno-strict-aliasing $(JANSSON_CPPFLAGS) $(USBUTILS_CPPFLAGS)
+INCLUDES	= $(PTHREAD_FLAGS) -fno-strict-aliasing $(JANSSON_INCLUDES) $(USBUTILS_INCLUDES)
 
 bin_PROGRAMS	= cgminer
 
@@ -96,6 +96,10 @@ endif
 
 if HAS_BAB
 cgminer_SOURCES += driver-bab.c
+endif
+
+if HAS_AVALON2
+cgminer_SOURCES += driver-avalon2.c driver-avalon2.h
 endif
 
 if HAS_MINION
