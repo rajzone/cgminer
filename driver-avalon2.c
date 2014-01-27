@@ -669,7 +669,7 @@ static int64_t avalon2_scanhash(struct thr_info *thr)
 		if (pool->swork.merkles > AVA2_P_MERKLES_COUNT)
 			quit(1, "Avalon2: Miner Manager merkles have to less then %d", AVA2_P_MERKLES_COUNT);
 
-		info->diff = ((int)pool->swork.diff) - 1;
+		info->diff = (int)pool->swork.diff - 1;
 		info->pool_no = pool->pool_no;
 
 		cg_wlock(&pool->data_lock);
