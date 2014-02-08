@@ -237,15 +237,15 @@ fi
 AM_CONDITIONAL([HAS_KNC], [test x$knc = xyes])
 
 avalon2="no"
- 
+
 AC_ARG_ENABLE([avalon2],
 	[AC_HELP_STRING([--enable-avalon2],[Compile support for Avalon2 (default disabled)])],
 	[avalon2=$enableval]
- 	)
+	)
 if test "x$avalon2" = xyes; then
 	AC_DEFINE([USE_FPGA_SERIAL], [1], [Defined to 1 if serial support required])
 	AC_DEFINE([USE_AVALON2], [1], [Defined to 1 if Avalon2 support is wanted])
- fi
+fi
 AM_CONDITIONAL([HAS_AVALON2], [test x$avalon2 = xyes])
 
 
@@ -485,7 +485,7 @@ if test "x$avalon2" = xyes; then
 	echo "  Avalon2.ASICs.........: Enabled"
 else
 	echo "  Avalon2.ASICs.........: Disabled"
-+fi
+fi
 
 if test "x$minion" = xyes; then
 	echo "  BlackArrowMinion.ASIC: Enabled"
