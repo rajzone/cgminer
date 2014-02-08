@@ -177,9 +177,20 @@ AC_ARG_ENABLE([bitfury],
 	[bitfury=$enableval]
 	)
 if test "x$bitfury" = xyes; then
-	AC_DEFINE([USE_BITFURY], [1], [Defined to 1 if BitFury support is wanted])
+	AC_DEFINE([USE_BITFURY], [1], [Defined to 1 if BitFury ASIC support is wanted])
 fi
 AM_CONDITIONAL([HAS_BITFURY], [test x$bitfury = xyes])
+
+drillbit="no"
+
+AC_ARG_ENABLE([drillbit],
+	[AC_HELP_STRING([--enable-drillbit],[Compile support for Drillbit BitFury ASICs (default disabled)])],
+	[drillbit=$enableval]
+	)
+if test "x$drillbit" = xyes; then
+	AC_DEFINE([USE_DRILLBIT], [1], [Defined to 1 if Drillbit BitFury support is wanted])
+fi
+AM_CONDITIONAL([HAS_DRILLBIT], [test x$drillbit = xyes])
 
 hashfast="no"
 
@@ -226,16 +237,28 @@ fi
 AM_CONDITIONAL([HAS_KNC], [test x$knc = xyes])
 
 avalon2="no"
-
+ 
 AC_ARG_ENABLE([avalon2],
 	[AC_HELP_STRING([--enable-avalon2],[Compile support for Avalon2 (default disabled)])],
 	[avalon2=$enableval]
-	)
+ 	)
 if test "x$avalon2" = xyes; then
 	AC_DEFINE([USE_FPGA_SERIAL], [1], [Defined to 1 if serial support required])
 	AC_DEFINE([USE_AVALON2], [1], [Defined to 1 if Avalon2 support is wanted])
-fi
+ fi
 AM_CONDITIONAL([HAS_AVALON2], [test x$avalon2 = xyes])
+
+
+minion="no"
+
+AC_ARG_ENABLE([minion],
+	[AC_HELP_STRING([--enable-minion],[Compile support for Minion BlackArrow ASIC (default disabled)])],
+	[minion=$enableval]
+	)
+if test "x$minion" = xyes; then
+	AC_DEFINE([USE_MINION], [1], [Defined to 1 if Minion BlackArrow ASIC support is wanted])
+fi
+AM_CONDITIONAL([HAS_MINION], [test x$minion = xyes])
 
 modminer="no"
 
@@ -272,14 +295,21 @@ else
 	])
 fi
 
-if test x$avalon$bitforce$bitfury$modminer$bflsc$icarus$hashfast$klondike != xnononononononono; then
+if test x$avalon$bitforce$bitfury$modminer$bflsc$icarus$hashfast$klondike$drillbit != xnonononononononono; then
 	want_usbutils=true
 else
 	want_usbutils=false
 fi
 
+if test x$bitfury != xno; then
+	want_libbitfury=true
+else
+	want_libbitfury=false
+fi
+
 AM_CONDITIONAL([NEED_FPGAUTILS], [test x$avalon2$modminer != xno])
 AM_CONDITIONAL([WANT_USBUTILS], [test x$want_usbutils != xfalse])
+AM_CONDITIONAL([WANT_LIBBITFURY], [test x$want_libbitfury != xfalse])
 AM_CONDITIONAL([HAVE_CURSES], [test x$curses = xyes])
 AM_CONDITIONAL([HAVE_WINDOWS], [test x$have_win32 = xtrue])
 AM_CONDITIONAL([HAVE_x86_64], [test x$have_x86_64 = xtrue])
@@ -404,13 +434,6 @@ fi
 
 AC_DEFINE_UNQUOTED([CGMINER_PREFIX], ["$prefix/bin"], [Path to cgminer install])
 
-AC_DEFINE_UNQUOTED([PHATK_KERNNAME], ["phatk121016"], [Filename for phatk kernel])
-AC_DEFINE_UNQUOTED([POCLBM_KERNNAME], ["poclbm130302"], [Filename for poclbm kernel])
-AC_DEFINE_UNQUOTED([DIAKGCN_KERNNAME], ["diakgcn121016"], [Filename for diakgcn kernel])
-AC_DEFINE_UNQUOTED([DIABLO_KERNNAME], ["diablo130302"], [Filename for diablo kernel])
-AC_DEFINE_UNQUOTED([SCRYPT_KERNNAME], ["scrypt130511"], [Filename for scrypt kernel])
-
-
 AC_SUBST(JANSSON_LIBS)
 AC_SUBST(PTHREAD_FLAGS)
 AC_SUBST(DLOPEN_FLAGS)
@@ -421,7 +444,6 @@ AC_SUBST(WS2_LIBS)
 AC_SUBST(MM_LIBS)
 AC_SUBST(MATH_LIBS)
 AC_SUBST(RT_LIBS)
-AC_SUBST(ADL_CPPFLAGS)
 
 AC_CONFIG_FILES([
 	Makefile
@@ -459,16 +481,22 @@ else
 	echo "  Avalon.ASICs.........: Disabled"
 fi
 
-if test "x$bab" = xyes; then
-	echo "  BlackArrow.ASICs.....: Enabled"
-else
-	echo "  BlackArrow.ASICs.....: Disabled"
-fi
-
 if test "x$avalon2" = xyes; then
 	echo "  Avalon2.ASICs.........: Enabled"
 else
 	echo "  Avalon2.ASICs.........: Disabled"
++fi
+
+if test "x$minion" = xyes; then
+	echo "  BlackArrowMinion.ASIC: Enabled"
+else
+	echo "  BlackArrowMinion.ASIC: Disabled"
+fi
+
+if test "x$bab" = xyes; then
+	echo "  BlackArrow.ASICs.....: Enabled"
+else
+	echo "  BlackArrow.ASICs.....: Disabled"
 fi
 
 if test "x$bflsc" = xyes; then
@@ -487,6 +515,12 @@ if test "x$bitfury" = xyes; then
 	echo "  BitFury.ASICs........: Enabled"
 else
 	echo "  BitFury.ASICs........: Disabled"
+fi
+
+if test "x$drillbit" = xyes; then
+	echo "  Drillbit.BitFury.....: Enabled"
+else
+	echo "  Drillbit.BitFury.....: Disabled"
 fi
 
 if test "x$hashfast" = xyes; then
@@ -519,7 +553,7 @@ else
 	echo "  ModMiner.FPGAs.......: Disabled"
 fi
 
-if test "x$avalon$avalon2$bab$bflsc$bitforce$bitfury$hashfast$icarus$klondike$knc$modminer" = xnononononononononono; then
+if test "x$avalon$avalon2$bab$bflsc$bitforce$bitfury$hashfast$icarus$klondike$knc$modminer$drillbit$minion" = xnononononononononononono; then
 	AC_MSG_ERROR([No mining configured in])
 fi
 
