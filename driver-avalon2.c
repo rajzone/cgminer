@@ -368,6 +368,7 @@ static int avalon2_stratum_pkgs(int fd, struct pool *pool, struct thr_info *thr)
 	struct avalon2_pkg pkg;
 	int i, a, b, tmp;
 	unsigned char target[32];
+	int job_id_len;
 
 	/* Send out the first stratum message STATIC */
 	applog(LOG_DEBUG, "Avalon2: Pool stratum message STATIC: %ld, %d, %d, %d, %d",
@@ -418,7 +419,10 @@ static int avalon2_stratum_pkgs(int fd, struct pool *pool, struct thr_info *thr)
 	applog(LOG_DEBUG, "Avalon2: Pool stratum message JOBS_ID: %s",
 	       pool->swork.job_id);
 	memset(pkg.data, 0, AVA2_P_DATA_LEN);
-	for (i = 0; i < 4; i++) {
+
+	job_id_len = strlen(pool->swork.job_id);
+	job_id_len = job_id_len >= 4 ? 4 : job_id_len;
+	for (i = 0; i < job_id_len; i++) {
 		pkg.data[i] = *(pool->swork.job_id + strlen(pool->swork.job_id) - 4 + i);
 	}
 	avalon2_init_pkg(&pkg, AVA2_P_JOB_ID, 1, 1);
@@ -660,6 +664,8 @@ static int64_t avalon2_scanhash(struct thr_info *thr)
 		thr->work_restart = false;
 		if (unlikely(info->first))
 			info->first = false;
+
+		get_work(thr, thr->id); /* Make sure pool is ready */
 
 		pool = current_pool();
 		if (!pool->has_stratum)
