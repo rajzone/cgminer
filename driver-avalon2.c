@@ -234,7 +234,7 @@ static int decode_pkg(struct thr_info *thr, struct avalon2_ret *ar, uint8_t *pkg
 				info->matching_work[modular_id * AVA2_DEFAULT_MINERS + miner]++;
 			nonce2 = bswap_32(nonce2);
 			nonce = be32toh(nonce);
-			nonce -= 0x180;
+			nonce -= 0x1000;
 
 			applog(LOG_DEBUG, "Avalon2: Found! [%s] %d:(%08x) (%08x)",
 			       job_id, pool_no, nonce2, nonce);
