@@ -6437,10 +6437,29 @@ static void gen_stratum_work(struct pool *pool, struct work *work)
 	/* Generate merkle root */
 	gen_hash(pool->coinbase, merkle_root, pool->swork.cb_len);
 	memcpy(merkle_sha, merkle_root, 32);
+
+		{
+			char *merkle_hash;
+			merkle_hash = bin2hex((const unsigned char *)merkle_root, 32);
+			applog(LOG_DEBUG, "DEBUG merkle %s", merkle_hash);
+			free(merkle_hash);
+
+			merkle_hash = bin2hex((const unsigned char *)pool->coinbase, pool->swork.cb_len);
+			applog(LOG_DEBUG, "DEBUG coinbase %s", merkle_hash);
+			free(merkle_hash);
+		}
+
 	for (i = 0; i < pool->swork.merkles; i++) {
 		memcpy(merkle_sha + 32, pool->swork.merkle_bin[i], 32);
 		gen_hash(merkle_sha, merkle_root, 64);
 		memcpy(merkle_sha, merkle_root, 32);
+
+		{
+			char *merkle_hash;
+			merkle_hash = bin2hex((const unsigned char *)merkle_root, 32);
+			applog(LOG_DEBUG, "DEBUG merkle %s", merkle_hash);
+		}
+
 	}
 	data32 = (uint32_t *)merkle_sha;
 	swap32 = (uint32_t *)merkle_root;
